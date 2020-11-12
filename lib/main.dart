@@ -1,20 +1,49 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
 
 void main() {
   runApp(MyApp());
+}
+
+class Counter extends ChangeNotifier
+{
+  int value = 0;
+
+  void increment () {
+    value++;
+    notifyListeners();
+  }
+  void decrement () {
+    value--;
+    notifyListeners();
+  }
+  void multiply () {
+    value = value * 2;
+    notifyListeners();
+  }
+  void divide () {
+    double temp = 0.0;
+    temp = value/2;
+    value = temp.toInt();
+    notifyListeners();
+  }
 }
 
 class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return ChangeNotifierProvider<Counter>(
+      create: (context) => Counter(),
+      child: MaterialApp(
       title: 'Flutter Demo',
       theme: ThemeData(
         primarySwatch: Colors.deepOrange,
       ),
       home: MyHomePage(title: 'Flutter Demo Home Page'),
 
+    ),
     );
   }
 }
@@ -29,33 +58,6 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
-
-  void _incrementCounter() {
-    setState(() {
-      _counter++;
-    });
-  }
-
-  void _decrementCounter(){
-    setState(() {
-      _counter--;
-    });
-  }
-
-  void _multipleCounter(){
-    setState(() {
-      _counter = _counter * 2;
-    });
-  }
-
-  void _divideCounter(){
-    setState(() {
-      double temp = 0.0;
-      temp = _counter/2;
-      _counter = temp.toInt();
-    });
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -67,27 +69,27 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
       body: Center(
 
-        child: Column(
+        child: Consumer<Counter>(
+          builder: (context, counter, child){
+            return Text(
 
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Text(
-              'You have pushed the action button and the results are:',
-            ),
-            Text(
-              '$_counter',
+              "${counter.value}",
               style: Theme.of(context).textTheme.headline4,
 
-            ),
-          ],
+            );
+          },
+          
         ),
+
       ),
 
       floatingActionButton: Column(
         mainAxisAlignment: MainAxisAlignment.end,
         children: <Widget>[
           FloatingActionButton(
-            onPressed: _incrementCounter,
+            onPressed: () {
+              Provider.of<Counter>(context, listen: false).increment();
+            },
             tooltip: 'Increment',
             child: Icon(Icons.add),
           ),
@@ -95,15 +97,19 @@ class _MyHomePageState extends State<MyHomePage> {
             height: 16,
           ),
           FloatingActionButton(
-            onPressed: _decrementCounter,
-            // tooltip: 'Decrement',
+            onPressed: () {
+              Provider.of<Counter>(context, listen: false).decrement();
+            },
+            tooltip: 'Decrement',
             child: Icon(Icons.remove),
           ),
           SizedBox(
             height: 16,
           ),
           FloatingActionButton(
-            onPressed: _multipleCounter,
+            onPressed: () {
+              Provider.of<Counter>(context, listen: false).multiply();
+            },
             tooltip: 'Multiply',
             child: Icon(Icons.clear),
           ),
@@ -111,7 +117,9 @@ class _MyHomePageState extends State<MyHomePage> {
             height: 16,
           ),
           FloatingActionButton(
-            onPressed: _divideCounter,
+            onPressed: () {
+              Provider.of<Counter>(context, listen: false).divide();
+            },
             tooltip: 'Divide',
             child: Icon(Icons.create),
           ),
